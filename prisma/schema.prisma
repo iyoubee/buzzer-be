@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -31,7 +31,7 @@ model message {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userId         String
+  userId         Int
   author         User     @relation("author", fields: [userId], references: [id])
   message        String
   isCloseFriends Boolean  @default(false)
