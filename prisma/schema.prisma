@@ -11,13 +11,31 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  email    String  @unique
-  hash     String
-  hashedRt String?
+  email        String    @unique
+  username     String    @unique
+  hash         String
+  hashedRt     String?
+  user         User?     @relation("closeFriends", fields: [id], references: [id])
+  closeFriends User[]    @relation("closeFriends")
+  message      message[] @relation("author")
 
   @@map("users")
+}
+
+model message {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId         String
+  author         User     @relation("author", fields: [userId], references: [id])
+  message        String
+  isCloseFriends Boolean  @default(false)
+  closeFriends   String[]
+
+  @@map("messages")
 }
