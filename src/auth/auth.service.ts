@@ -37,6 +37,21 @@ export class AuthService {
         throw error;
       });
 
+    const id = await this.prisma.user.findUnique({
+      where: { username: dto.username },
+      select: {
+        id: true,
+      },
+    });
+
+    const update = await this.prisma.user.update({
+      where: {
+        username: dto.username,
+      },
+      data: {
+        closeFriends: [id?.id as number],
+      },
+    });
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
 

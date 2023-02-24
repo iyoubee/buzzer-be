@@ -33,9 +33,14 @@ export class UserService {
             author: {
               username: username,
             },
+            OR: {
+              isCloseFriends: false,
+              closeFriends: {
+                has: userId,
+              },
+            },
           },
         });
-        message.filter((message) => message.closeFriends.includes(userId));
         return message;
       }
     }
