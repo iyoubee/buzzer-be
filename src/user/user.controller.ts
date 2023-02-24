@@ -22,7 +22,7 @@ export class UserController {
   @Get('getMessage/:username')
   @HttpCode(HttpStatus.OK)
   getUser(
-    @GetCurrentUserId() userId: number,
+    @GetCurrentUserId() userId: number | undefined,
     @Param('username') username: string,
   ): Promise<Message[] | undefined> {
     return this.userService.getMessage(userId, username);

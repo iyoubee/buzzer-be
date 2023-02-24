@@ -11,45 +11,17 @@ export class UserService {
     userId: number | undefined,
     username: string,
   ): Promise<Message[] | undefined> {
-    const userIdDB = await this.prisma.user.findUnique({
-      where: { username: username },
-      select: {
-        id: true,
-      },
-    });
-    if (userId) {
-      if (userId == userIdDB?.id) {
-        const message = await this.prisma.message.findMany({
-          where: {
-            author: {
-              username: username,
-            },
-          },
-        });
-        return message;
-      } else {
-        const message = await this.prisma.message.findMany({
-          where: {
-            author: {
-              username: username,
-            },
-            OR: {
-              isCloseFriends: false,
-              closeFriends: {
-                has: userId,
-              },
-            },
-          },
-        });
-        return message;
-      }
-    }
     const message = await this.prisma.message.findMany({
       where: {
         author: {
           username: username,
         },
-        isCloseFriends: false,
+        OR: {
+          isCloseFriends: false,
+          closeFriends: {
+            has: userId,
+          },
+        },
       },
     });
     return message;
