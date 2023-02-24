@@ -4,13 +4,14 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Get,
   UseGuards,
 } from '@nestjs/common';
+import { User } from '@prisma/client';
 
 import { Public, GetCurrentUserId, GetCurrentUser } from '../common/decorators';
-import { RtGuard } from '../common/guards';
+import { RtGuard, AtGuard } from '../common/guards';
 import { AuthService } from './auth.service';
-import { AuthDto } from './dto';
 import { SignInDto } from './dto/signin.dto';
 import { SignUpDto } from './dto/signup.dto';
 import { Tokens } from './types';
@@ -39,9 +40,16 @@ export class AuthController {
     return this.authService.logout(userId);
   }
 
+  @UseGuards(AtGuard)
+  @Get('getUser')
+  @HttpCode(HttpStatus.OK)
+  getUser(@GetCurrentUserId() userId: number): Promise<User | null> {
+    return this.authService.getUserData(userId);
+  }
+
   @Public()
   @UseGuards(RtGuard)
-  @Post('refresh')
+  @Get('refresh')
   @HttpCode(HttpStatus.OK)
   refreshTokens(
     @GetCurrentUserId() userId: number,

@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as argon from 'argon2';
 import { PrismaService } from '../prisma/prisma.service';
@@ -73,6 +74,15 @@ export class AuthService {
       },
     });
     return true;
+  }
+
+  async getUserData(userId: number): Promise<User | null> {
+    const data = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    return data;
   }
 
   async refreshTokens(userId: number, rt: string): Promise<Tokens> {
