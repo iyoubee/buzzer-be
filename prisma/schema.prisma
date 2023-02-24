@@ -19,8 +19,7 @@ model User {
   username     String    @unique
   hash         String
   hashedRt     String?
-  user         User?     @relation("closeFriends", fields: [id], references: [id])
-  closeFriends User[]    @relation("closeFriends")
+  closeFriends String[]
   message      message[] @relation("author")
 
   @@map("users")
