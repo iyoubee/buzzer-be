@@ -19,22 +19,22 @@ model User {
   username     String    @unique
   hash         String
   hashedRt     String?
-  closeFriends String[]
-  message      message[] @relation("author")
+  closeFriends Int[]
+  message      Message[] @relation("author")
 
   @@map("users")
 }
 
-model message {
+model Message {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   userId         Int
-  author         User     @relation("author", fields: [userId], references: [id])
+  author         User    @relation("author", fields: [userId], references: [id])
   message        String
-  isCloseFriends Boolean  @default(false)
-  closeFriends   String[]
+  isCloseFriends Boolean @default(false)
+  closeFriends   Int[]
 
   @@map("messages")
 }
