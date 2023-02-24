@@ -23,10 +23,26 @@ export class UserController {
   @Get('getMessage/:username')
   @HttpCode(HttpStatus.OK)
   getMessage(
-    @GetCurrentUserId() userId: number | undefined,
+    @GetCurrentUserId() userId: number,
     @Param('username') username: string,
   ): Promise<Message[] | undefined> {
     return this.userService.getMessage(userId, username);
+  }
+
+  @Public()
+  @Get('getMessage')
+  @HttpCode(HttpStatus.OK)
+  getAllMessage(): Promise<Message[] | undefined> {
+    return this.userService.getAllMessage();
+  }
+
+  @UseGuards(AtGuard)
+  @Get('getMessageAuth')
+  @HttpCode(HttpStatus.OK)
+  getAllMessageAuth(
+    @GetCurrentUserId() userId: number,
+  ): Promise<Message[] | undefined> {
+    return this.userService.getAllMessageAuth(userId);
   }
 
   @UseGuards(AtGuard)

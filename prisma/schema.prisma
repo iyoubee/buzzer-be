@@ -31,7 +31,7 @@ model Message {
   updatedAt DateTime @updatedAt
 
   userId         Int
-  author         User    @relation("author", fields: [userId], references: [id])
+  author         User    @relation("author", fields: [userId], references: [id], onDelete: Cascade)
   message        String
   isCloseFriends Boolean @default(false)
   closeFriends   Int[]

@@ -8,21 +8,56 @@ import { MessageDto } from './dto/message.dto';
 export class UserService {
   constructor(private prisma: PrismaService, private config: ConfigService) {}
 
-  async getMessage(
-    userId: number | undefined,
+  async getMessageAuthed(
+    userId: number,
     username: string,
   ): Promise<Message[] | undefined> {
     const message = await this.prisma.message.findMany({
       where: {
-        author: {
-          username: username,
-        },
-        OR: {
-          isCloseFriends: false,
-          closeFriends: {
-            has: userId,
+        AND: [
+          {
+            author: {
+              username: username,
+            },
           },
-        },
+          {
+            OR: [
+              { isCloseFriends: false },
+              {
+                closeFriends: {
+                  has: userId,
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+    return message;
+  }
+
+  async getAllMessage(): Promise<Message[] | undefined> {
+    const message = await this.prisma.message.findMany({
+      where: {
+        isCloseFriends: false,
+      },
+    });
+    return message;
+  }
+
+  async getAllMessageAuth(userId: number): Promise<Message[] | undefined> {
+    const message = await this.prisma.message.findMany({
+      where: {
+        OR: [
+          {
+            closeFriends: {
+              has: userId,
+            },
+          },
+          {
+            isCloseFriends: false,
+          },
+        ],
       },
     });
     return message;
@@ -33,6 +68,7 @@ export class UserService {
       data: {
         userId: userId,
         message: dto.message,
+        closeFriends: [userId],
       },
     });
     return res;
