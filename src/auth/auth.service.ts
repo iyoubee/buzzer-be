@@ -44,7 +44,7 @@ export class AuthService {
       },
     });
 
-    const update = await this.prisma.user.update({
+    await this.prisma.user.update({
       where: {
         username: dto.username,
       },
@@ -98,6 +98,16 @@ export class AuthService {
       },
     });
     return data;
+  }
+
+  async getUserCloseFriends(userId: number): Promise<number[] | undefined> {
+    const data = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: { closeFriends: true },
+    });
+    return data?.closeFriends;
   }
 
   async refreshTokens(userId: number, rt: string): Promise<Tokens> {
