@@ -100,16 +100,6 @@ export class AuthService {
     return data;
   }
 
-  async getUserCloseFriends(userId: number): Promise<number[] | undefined> {
-    const data = await this.prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      select: { closeFriends: true },
-    });
-    return data?.closeFriends;
-  }
-
   async refreshTokens(userId: number, rt: string): Promise<Tokens> {
     const user = await this.prisma.user.findUnique({
       where: {

@@ -47,15 +47,6 @@ export class AuthController {
     return this.authService.getUserData(userId);
   }
 
-  @UseGuards(AtGuard)
-  @Get('getCloseFriends')
-  @HttpCode(HttpStatus.OK)
-  getCloseFriends(
-    @GetCurrentUserId() userId: number,
-  ): Promise<number[] | undefined> {
-    return this.authService.getUserCloseFriends(userId);
-  }
-
   @Public()
   @UseGuards(RtGuard)
   @Get('refresh')
