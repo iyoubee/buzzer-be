@@ -47,6 +47,9 @@ export class UserService {
       include: {
         author: true,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
     return message;
   }
@@ -90,6 +93,9 @@ export class UserService {
         include: {
           author: true,
         },
+        orderBy: {
+          createdAt: 'desc',
+        },
       });
       return message;
     } else {
@@ -99,6 +105,9 @@ export class UserService {
         },
         include: {
           author: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
         },
       });
       return message;
@@ -112,6 +121,9 @@ export class UserService {
       },
       include: {
         author: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
     return message;
