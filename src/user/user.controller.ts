@@ -46,6 +46,13 @@ export class UserController {
   }
 
   @UseGuards(AtGuard)
+  @Get('getUser')
+  @HttpCode(HttpStatus.OK)
+  getAllUser(): Promise<User[]> {
+    return this.userService.getAllUser();
+  }
+
+  @UseGuards(AtGuard)
   @Post('post/message/public')
   @HttpCode(HttpStatus.OK)
   sendPublicMessage(

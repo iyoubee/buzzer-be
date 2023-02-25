@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Message } from '@prisma/client';
+import { Message, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CloseFriendsDto } from './dto/closeFriends.dto';
 import { MessageDto } from './dto/message.dto';
 
 @Injectable()
@@ -81,7 +82,7 @@ export class UserService {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
-        closeFriends: true,
+        closeFriending: true,
       },
     });
 
@@ -99,10 +100,19 @@ export class UserService {
       },
       data: {
         closeFriends: {
-          connect: user?.closeFriends.map((c) => ({ id: c.id })),
+          connect: user?.closeFriending.map((c) => ({ id: c.id })),
         },
       },
     });
     return res;
+  }
+
+  async getAllUser(): Promise<any[]> {
+    const user = await this.prisma.user.findMany({
+      orderBy: {
+        username: 'asc',
+      },
+    });
+    return user;
   }
 }

@@ -19,8 +19,8 @@ model User {
   username                String    @unique
   hash                    String
   hashedRt                String?
-  self                    User?     @relation("closeFriends", fields: [id], references: [id])
-  closeFriends            User[]    @relation("closeFriends")
+  closeFriendsBy          User[]    @relation("UserFollows")
+  closeFriending          User[]    @relation("UserFollows")
   message                 Message[] @relation("author")
   messageFromCloseFriends Message[]
 

@@ -37,22 +37,6 @@ export class AuthService {
         throw error;
       });
 
-    const id = await this.prisma.user.findUnique({
-      where: { username: dto.username },
-    });
-
-    await this.prisma.user.update({
-      where: {
-        username: dto.username,
-      },
-      data: {
-        self: {
-          connect: {
-            id: id?.id,
-          },
-        },
-      },
-    });
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
 
@@ -96,6 +80,9 @@ export class AuthService {
     const data = await this.prisma.user.findUnique({
       where: {
         id: userId,
+      },
+      include: {
+        closeFriending: true,
       },
     });
     return data;
