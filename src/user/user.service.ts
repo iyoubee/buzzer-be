@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Message, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CloseFriendsDto } from './dto/closeFriends.dto';
+import { DeleteMessageDto } from './dto/deleteMessage.dto';
+import { EditMessageDto } from './dto/editMessage.dto';
 import { MessageDto } from './dto/message.dto';
 
 @Injectable()
@@ -115,6 +117,57 @@ export class UserService {
       },
     });
     return message;
+  }
+
+  async editMessage(userId: number, dto: EditMessageDto): Promise<Message> {
+    const message = await this.prisma.message.findUnique({
+      where: {
+        id: dto.messageId,
+      },
+      select: {
+        author: {
+          select: { id: true },
+        },
+      },
+    });
+
+    if (message?.author.id == userId) {
+      const res = await this.prisma.message.update({
+        where: {
+          id: dto.messageId,
+        },
+        data: {
+          message: dto.message,
+        },
+      });
+      return res;
+    } else {
+      throw new ForbiddenException('Credentials incorrect');
+    }
+  }
+
+  async deleteMessage(userId: number, dto: DeleteMessageDto): Promise<Message> {
+    const message = await this.prisma.message.findUnique({
+      where: {
+        id: dto.messageId,
+      },
+      select: {
+        author: {
+          select: { id: true },
+        },
+      },
+    });
+
+    if (message?.author.id == userId) {
+      const res = await this.prisma.message.delete({
+        where: {
+          id: dto.messageId,
+        },
+      });
+      return res;
+    } else {
+      throw new ForbiddenException('Credentials incorrect');
+    }
   }
 
   async sendPublicMessage(userId: number, dto: MessageDto): Promise<Message> {

@@ -9,13 +9,16 @@ import {
   UseGuards,
   Param,
   Put,
+  Delete,
 } from '@nestjs/common';
 import { Message, User } from '@prisma/client';
 
-import { Public, GetCurrentUserId, GetCurrentUser } from '../common/decorators';
-import { RtGuard, AtGuard } from '../common/guards';
+import { Public, GetCurrentUserId } from '../common/decorators';
+import { AtGuard } from '../common/guards';
 import { MessageDto } from './dto/message.dto';
 import { CloseFriendsDto } from './dto/closeFriends.dto';
+import { DeleteMessageDto } from './dto/deleteMessage.dto';
+import { EditMessageDto } from './dto/editMessage.dto';
 
 @Controller('user')
 export class UserController {
@@ -61,6 +64,26 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   getAllUser(): Promise<User[]> {
     return this.userService.getAllUser();
+  }
+
+  @UseGuards(AtGuard)
+  @Post('post/delete')
+  @HttpCode(HttpStatus.OK)
+  deleteMessage(
+    @GetCurrentUserId() userId: number,
+    @Body() dto: DeleteMessageDto,
+  ): Promise<Message> {
+    return this.userService.deleteMessage(userId, dto);
+  }
+
+  @UseGuards(AtGuard)
+  @Put('post/edit')
+  @HttpCode(HttpStatus.OK)
+  editMessage(
+    @GetCurrentUserId() userId: number,
+    @Body() dto: EditMessageDto,
+  ): Promise<Message> {
+    return this.userService.editMessage(userId, dto);
   }
 
   @UseGuards(AtGuard)
