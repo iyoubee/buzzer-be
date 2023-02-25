@@ -15,12 +15,14 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  email        String    @unique
-  username     String    @unique
-  hash         String
-  hashedRt     String?
-  closeFriends Int[]
-  message      Message[] @relation("author")
+  email                   String    @unique
+  username                String    @unique
+  hash                    String
+  hashedRt                String?
+  self                    User?     @relation("closeFriends", fields: [id], references: [id])
+  closeFriends            User[]    @relation("closeFriends")
+  message                 Message[] @relation("author")
+  messageFromCloseFriends Message[]
 
   @@map("users")
 }
@@ -34,7 +36,7 @@ model Message {
   author         User    @relation("author", fields: [userId], references: [id], onDelete: Cascade)
   message        String
   isCloseFriends Boolean @default(false)
-  closeFriends   Int[]
+  closeFriends   User[]
 
   @@map("messages")
 }

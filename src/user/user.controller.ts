@@ -20,13 +20,13 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Public()
-  @Get('getMessage/:username')
+  @Get('getMessageAuthed/:username')
   @HttpCode(HttpStatus.OK)
   getMessage(
     @GetCurrentUserId() userId: number,
     @Param('username') username: string,
   ): Promise<Message[] | undefined> {
-    return this.userService.getMessage(userId, username);
+    return this.userService.getMessageAuthed(userId, username);
   }
 
   @Public()

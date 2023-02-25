@@ -39,9 +39,6 @@ export class AuthService {
 
     const id = await this.prisma.user.findUnique({
       where: { username: dto.username },
-      select: {
-        id: true,
-      },
     });
 
     await this.prisma.user.update({
@@ -49,7 +46,11 @@ export class AuthService {
         username: dto.username,
       },
       data: {
-        closeFriends: [id?.id as number],
+        self: {
+          connect: {
+            id: id?.id,
+          },
+        },
       },
     });
     const tokens = await this.getTokens(user.id, user.email);

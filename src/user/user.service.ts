@@ -25,7 +25,9 @@ export class UserService {
               { isCloseFriends: false },
               {
                 closeFriends: {
-                  has: userId,
+                  some: {
+                    id: userId,
+                  },
                 },
               },
             ],
@@ -51,7 +53,9 @@ export class UserService {
         OR: [
           {
             closeFriends: {
-              has: userId,
+              some: {
+                id: userId,
+              },
             },
           },
           {
@@ -68,7 +72,6 @@ export class UserService {
       data: {
         userId: userId,
         message: dto.message,
-        closeFriends: [userId],
       },
     });
     return res;
@@ -87,7 +90,17 @@ export class UserService {
         userId: userId,
         message: dto.message,
         isCloseFriends: true,
-        closeFriends: user?.closeFriends,
+      },
+    });
+
+    await this.prisma.message.update({
+      where: {
+        id: res.id,
+      },
+      data: {
+        closeFriends: {
+          connect: user?.closeFriends.map((c) => ({ id: c.id })),
+        },
       },
     });
     return res;
