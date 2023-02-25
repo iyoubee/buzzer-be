@@ -9,7 +9,6 @@ import {
   UseGuards,
   Param,
   Put,
-  Delete,
 } from '@nestjs/common';
 import { Message, User } from '@prisma/client';
 
@@ -19,10 +18,28 @@ import { MessageDto } from './dto/message.dto';
 import { CloseFriendsDto } from './dto/closeFriends.dto';
 import { DeleteMessageDto } from './dto/deleteMessage.dto';
 import { EditMessageDto } from './dto/editMessage.dto';
+import { EditUserDto } from './dto/editUser.dto';
 
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
+
+  @Public()
+  @Get('simple/:username')
+  @HttpCode(HttpStatus.OK)
+  getSimple(@Param('username') username: string): Promise<User | null> {
+    return this.userService.simple(username);
+  }
+
+  @UseGuards(AtGuard)
+  @Put('edit')
+  @HttpCode(HttpStatus.OK)
+  editUser(
+    @GetCurrentUserId() userId: number,
+    @Body() dto: EditUserDto,
+  ): Promise<User> {
+    return this.userService.editUser(userId, dto);
+  }
 
   @Public()
   @Get('getMessage/:username')

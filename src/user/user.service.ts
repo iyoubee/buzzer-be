@@ -5,11 +5,36 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CloseFriendsDto } from './dto/closeFriends.dto';
 import { DeleteMessageDto } from './dto/deleteMessage.dto';
 import { EditMessageDto } from './dto/editMessage.dto';
+import { EditUserDto } from './dto/editUser.dto';
 import { MessageDto } from './dto/message.dto';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService, private config: ConfigService) {}
+
+  async simple(username: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username: username,
+      },
+    });
+
+    return user;
+  }
+
+  async editUser(userId: number, dto: EditUserDto): Promise<User> {
+    const user = await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        username: dto.username,
+        bio: dto.bio,
+      },
+    });
+
+    return user;
+  }
 
   async getMessage(username: string): Promise<Message[] | undefined> {
     const message = await this.prisma.message.findMany({
