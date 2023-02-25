@@ -8,21 +8,32 @@ import {
   Get,
   UseGuards,
   Param,
+  Put,
 } from '@nestjs/common';
 import { Message, User } from '@prisma/client';
 
 import { Public, GetCurrentUserId, GetCurrentUser } from '../common/decorators';
 import { RtGuard, AtGuard } from '../common/guards';
 import { MessageDto } from './dto/message.dto';
+import { CloseFriendsDto } from './dto/closeFriends.dto';
 
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Public()
-  @Get('getMessageAuthed/:username')
+  @Get('getMessage/:username')
   @HttpCode(HttpStatus.OK)
   getMessage(
+    @Param('username') username: string,
+  ): Promise<Message[] | undefined> {
+    return this.userService.getMessage(username);
+  }
+
+  @UseGuards(AtGuard)
+  @Get('getMessageAuthed/:username')
+  @HttpCode(HttpStatus.OK)
+  getMessageAuthed(
     @GetCurrentUserId() userId: number,
     @Param('username') username: string,
   ): Promise<Message[] | undefined> {
@@ -70,5 +81,25 @@ export class UserController {
     @Body() dto: MessageDto,
   ): Promise<Message> {
     return this.userService.sendPrivateMessage(userId, dto);
+  }
+
+  @UseGuards(AtGuard)
+  @Put('closeFriends/disconnect')
+  @HttpCode(HttpStatus.OK)
+  disconnectCloseFriends(
+    @GetCurrentUserId() userId: number,
+    @Body() dto: CloseFriendsDto,
+  ): Promise<User> {
+    return this.userService.disconnectCloseFriends(userId, dto);
+  }
+
+  @UseGuards(AtGuard)
+  @Put('closeFriends/connect')
+  @HttpCode(HttpStatus.OK)
+  connectCloseFriends(
+    @GetCurrentUserId() userId: number,
+    @Body() dto: CloseFriendsDto,
+  ): Promise<User> {
+    return this.userService.connectCloseFriends(userId, dto);
   }
 }

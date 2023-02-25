@@ -9,40 +9,79 @@ import { MessageDto } from './dto/message.dto';
 export class UserService {
   constructor(private prisma: PrismaService, private config: ConfigService) {}
 
+  async getMessage(username: string): Promise<Message[] | undefined> {
+    const message = await this.prisma.message.findMany({
+      where: {
+        author: {
+          username: username,
+        },
+        isCloseFriends: false,
+      },
+      include: {
+        author: true,
+      },
+    });
+    return message;
+  }
+
   async getMessageAuthed(
     userId: number,
     username: string,
   ): Promise<Message[] | undefined> {
-    const message = await this.prisma.message.findMany({
+    const user = await this.prisma.user.findUnique({
       where: {
-        AND: [
-          {
-            author: {
-              username: username,
-            },
-          },
-          {
-            OR: [
-              { isCloseFriends: false },
-              {
-                closeFriends: {
-                  some: {
-                    id: userId,
-                  },
-                },
-              },
-            ],
-          },
-        ],
+        id: userId,
       },
     });
-    return message;
+
+    if (user?.username != username) {
+      const message = await this.prisma.message.findMany({
+        where: {
+          // author: { username: username },
+          OR: [
+            {
+              AND: [
+                { author: { username: username } },
+                { isCloseFriends: true },
+                {
+                  closeFriends: {
+                    some: {
+                      id: userId,
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              AND: [
+                { author: { username: username } },
+                { isCloseFriends: false },
+              ],
+            },
+          ],
+        },
+        include: {
+          author: true,
+        },
+      });
+      return message;
+    } else {
+      const message = await this.prisma.message.findMany({
+        where: {
+          author: { username: username },
+        },
+      });
+      return message;
+    }
   }
 
   async getAllMessage(): Promise<Message[] | undefined> {
     const message = await this.prisma.message.findMany({
       where: {
         isCloseFriends: false,
+      },
+      include: {
+        author: true,
       },
     });
     return message;
@@ -54,15 +93,22 @@ export class UserService {
         OR: [
           {
             closeFriends: {
-              some: {
-                id: userId,
-              },
+              some: { id: userId },
             },
           },
           {
             isCloseFriends: false,
           },
+          {
+            author: { id: userId },
+          },
         ],
+      },
+      include: {
+        author: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
     return message;
@@ -114,5 +160,39 @@ export class UserService {
       },
     });
     return user;
+  }
+
+  async connectCloseFriends(
+    userId: number,
+    dto: CloseFriendsDto,
+  ): Promise<User> {
+    const res = await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        closeFriending: {
+          connect: { id: dto.closeFriendsId },
+        },
+      },
+    });
+    return res;
+  }
+
+  async disconnectCloseFriends(
+    userId: number,
+    dto: CloseFriendsDto,
+  ): Promise<User> {
+    const res = await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        closeFriending: {
+          disconnect: { id: dto.closeFriendsId },
+        },
+      },
+    });
+    return res;
   }
 }

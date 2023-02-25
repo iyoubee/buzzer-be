@@ -1,6 +1,7 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CloseFriendsDto {
   @IsNotEmpty()
-  closeFriendsList: any[];
+  @IsNumber()
+  closeFriendsId: number;
 }
