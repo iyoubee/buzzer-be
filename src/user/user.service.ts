@@ -70,6 +70,9 @@ export class UserService {
         where: {
           author: { username: username },
         },
+        include: {
+          author: true,
+        },
       });
       return message;
     }
